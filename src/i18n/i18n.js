@@ -1,22 +1,35 @@
-import i18n from "i18next";
-import { initReactI18next } from "react-i18next";
-import LanguageDetector from "i18next-browser-languagedetector";
-
-import en from "./en.json";
-import ptBR from "./ptBR.json";
-import es from "./es.json";
+// src/i18n/i18n.js
+import i18n from 'i18next'
+import { initReactI18next } from 'react-i18next'
 
 i18n
-  .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources: {
-      en: { translation: en },
-      "pt-BR": { translation: ptBR },
-      es: { translation: es }
+      en: {
+        translation: {
+          welcome: 'Welcome',
+          goodbye: 'Goodbye',
+        },
+      },
+      pt: {
+        translation: {
+          welcome: 'Bem-vindo',
+          goodbye: 'Tchau',
+        },
+      },
+      es: {
+        translation: {
+          welcome: 'Bienvenido',
+          goodbye: 'Adiós',
+        },
+      },
     },
-    fallbackLng: "pt-BR",
-    interpolation: { escapeValue: false }
-  });
+    lng: 'pt', // idioma inicial
+    fallbackLng: 'en', // idioma de fallback
+    interpolation: {
+      escapeValue: false,
+    },
+  })
 
-export default i18n;
+export default i18n

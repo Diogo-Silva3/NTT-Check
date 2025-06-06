@@ -4,26 +4,103 @@
 
 @layer base {
   :root {
-    --background: 220 15% 6%;
-    --foreground: 210 40% 98%;
-    --card: 220 15% 8%;
-    --card-foreground: 210 40% 98%;
-    --popover: 220 15% 8%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 142 76% 36%;
-    --primary-foreground: 355 7% 97%;
-    --secondary: 215 27.9% 16.9%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 215 27.9% 16.9%;
-    --muted-foreground: 217.9 10.6% 64.9%;
-    --accent: 215 27.9% 16.9%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 215 27.9% 16.9%;
-    --input: 215 27.9% 16.9%;
-    --ring: 142 76% 36%;
+    /* Cores baseadas no site da NTT DATA (https://www.nttdata.com/global/en/) */
+    --company-bg-light: 255 100% 100%; /* Branco para fundo principal */
+    --company-bg-medium: 220 13% 95%; /* Cinza claro para fundos secundários/cards */
+    --company-bg-dark: 220 15% 15%; /* Azul muito escuro para modo escuro */
+    
+    --company-text-primary-light: 220 15% 20%; /* Quase preto para texto principal em fundo claro */
+    --company-text-secondary-light: 220 10% 45%; /* Cinza para texto secundário em fundo claro */
+    --company-text-primary-dark: 210 30% 95%; /* Branco/Cinza muito claro para texto principal em fundo escuro */
+    --company-text-secondary-dark: 210 20% 75%; /* Cinza claro para texto secundário em fundo escuro */
+
+    --company-brand-blue: 212 100% 35%; /* Azul principal NTT DATA: #00509D */
+    --company-brand-blue-darker: 212 100% 25%; /* Azul mais escuro para hover/detalhes */
+    --company-brand-blue-lighter: 212 90% 55%; /* Azul mais claro para acentos */
+    --company-brand-blue-text: 255 100% 100%; /* Branco para texto sobre o azul principal */
+
+    --company-accent-cyan: 188 78% 47%; /* Ciano do site: #24BEE8 */
+    --company-accent-magenta: 320 70% 55%; /* Magenta/Roxo do site (aproximado) */
+    
+    --company-border-light: 220 15% 85%; /* Borda cinza clara */
+    --company-border-dark: 220 10% 30%; /* Borda cinza escura para modo escuro */
+
+    /* Mapeamento para variáveis do tema claro (default) */
+    --background: var(--company-bg-light);
+    --foreground: var(--company-text-primary-light);
+    
+    --card: var(--company-bg-medium);
+    --card-foreground: var(--company-text-primary-light);
+    
+    --popover: var(--company-bg-light);
+    --popover-foreground: var(--company-text-primary-light);
+    
+    --primary: var(--company-brand-blue);
+    --primary-foreground: var(--company-brand-blue-text);
+    
+    --secondary: var(--company-text-secondary-light);
+    --secondary-foreground: var(--company-text-primary-light);
+    
+    --muted: 220 15% 90%; 
+    --muted-foreground: var(--company-text-secondary-light);
+    
+    --accent: var(--company-accent-cyan);
+    --accent-foreground: var(--company-text-primary-light); /* Texto sobre ciano pode ser escuro */
+    
+    --destructive: 0 70% 50%; 
+    --destructive-foreground: 255 100% 100%;
+    
+    --border: var(--company-border-light);
+    --input: var(--company-bg-medium); 
+    --ring: var(--company-brand-blue-lighter);
+    
     --radius: 0.5rem;
+
+    /* Variáveis específicas NTT DATA para fácil acesso no CSS */
+    --ntt-bg: var(--company-bg-light);
+    --ntt-text-primary: var(--company-text-primary-light);
+    --ntt-text-secondary: var(--company-text-secondary-light);
+    --ntt-brand: var(--company-brand-blue);
+    --ntt-brand-foreground: var(--company-brand-blue-text);
+    --ntt-brand-accent: var(--company-accent-cyan);
+    --ntt-card-bg: var(--company-bg-medium);
+    --ntt-header-bg: var(--company-bg-light); /* Cabeçalho pode ser branco */
+    --ntt-input-bg: var(--company-bg-light); /* Inputs brancos com borda */
+    --ntt-border: var(--company-border-light);
+  }
+
+  .dark {
+    --background: var(--company-bg-dark);
+    --foreground: var(--company-text-primary-dark);
+    --card: 220 15% 10%; /* Um pouco mais claro que o fundo */
+    --card-foreground: var(--company-text-primary-dark);
+    --popover: var(--company-bg-dark);
+    --popover-foreground: var(--company-text-primary-dark);
+    --primary: var(--company-brand-blue-lighter); /* Azul mais claro para destaque no escuro */
+    --primary-foreground: var(--company-text-primary-light); /* Texto escuro sobre azul claro */
+    --secondary: var(--company-text-secondary-dark);
+    --secondary-foreground: var(--company-text-primary-dark);
+    --muted: 220 10% 25%;
+    --muted-foreground: var(--company-text-secondary-dark);
+    --accent: var(--company-accent-cyan);
+    --accent-foreground: var(--company-text-primary-light);
+    --destructive: 0 60% 55%;
+    --destructive-foreground: var(--company-text-primary-dark);
+    --border: var(--company-border-dark);
+    --input: 220 15% 12%;
+    --ring: var(--company-accent-cyan);
+
+    /* Variáveis NTT DATA para modo escuro */
+    --ntt-bg: var(--company-bg-dark);
+    --ntt-text-primary: var(--company-text-primary-dark);
+    --ntt-text-secondary: var(--company-text-secondary-dark);
+    --ntt-brand: var(--company-brand-blue-lighter);
+    --ntt-brand-foreground: var(--company-text-primary-light);
+    --ntt-brand-accent: var(--company-accent-cyan);
+    --ntt-card-bg: 220 15% 10%;
+    --ntt-header-bg: 220 15% 8%; /* Header um pouco mais escuro */
+    --ntt-input-bg: 220 15% 12%;
+    --ntt-border: var(--company-border-dark);
   }
 }
 
@@ -32,46 +109,16 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
-    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
-    min-height: 100vh;
+    @apply bg-company-background text-company-foreground;
+    font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
-.glass-effect {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.gradient-border {
-  background: linear-gradient(45deg, #22c55e, #3b82f6, #8b5cf6);
-  padding: 2px;
-  border-radius: 12px;
-}
-
-.gradient-border-inner {
-  background: rgba(15, 15, 35, 0.95);
-  border-radius: 10px;
-  height: 100%;
-  width: 100%;
-}
-
-.camera-preview {
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 20px 40px rgba(34, 197, 94, 0.2);
-}
-
-.equipment-card {
-  transition: all 0.3s ease;
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
-}
-
-.equipment-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 40px rgba(34, 197, 94, 0.3);
-}
+/* Removendo estilos anteriores de .glass-effect e .equipment-card para simplificar
+   e usar as cores definidas no tailwind.config.js e :root
+*/
 
 .pulse-animation {
   animation: pulse 2s infinite;

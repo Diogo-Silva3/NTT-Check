@@ -10,19 +10,59 @@ import 'jspdf-autotable';
 import { format, parseISO, startOfDay, endOfDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
-const ReportModal = ({ isOpen, onClose, equipments, locations }) => {
+const ReportModal = ({ isOpen, onClose, equipments, locations, logoUrl, logoPlaceholder }) => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('all');
 
   const generatePDF = async () => {
     const doc = new jsPDF();
+    let currentY = 15;
+
+    if (logoUrl) {
+      try {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        const imgPromise = new Promise((resolve, reject) => {
+          img.onload = () => resolve(img);
+          img.onerror = reject;
+        });
+        img.src = logoUrl;
+        await imgPromise;
+        
+        const aspectRatio = img.width / img.height;
+        let imgWidth = 30; 
+        let imgHeight = imgWidth / aspectRatio;
+        if (imgHeight > 15) {
+            imgHeight = 15;
+            imgWidth = imgHeight * aspectRatio;
+        }
+        doc.addImage(img, 'PNG', 15, currentY, imgWidth, imgHeight);
+        currentY += imgHeight + 5; 
+      } catch (error) {
+        console.error("Erro ao carregar logo para PDF:", error);
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text(`(Erro ao carregar logo: ${logoPlaceholder})`, 15, currentY);
+        currentY += 10;
+      }
+    } else if (logoPlaceholder) {
+        doc.setFontSize(12);
+        doc.setTextColor(0, 80, 157); 
+        doc.text(logoPlaceholder, 15, currentY);
+        currentY += 10;
+    }
+
+
+    doc.setFontSize(18);
+    doc.setTextColor(50, 50, 50); 
+    doc.text('Relatório de Equipamentos de TI', 15, currentY);
+    currentY += 10;
     
-    doc.setFontSize(20);
-    doc.text('Relatório de Equipamentos de TI', 15, 20);
-    
-    doc.setFontSize(12);
-    doc.text(`Data de geração: ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: ptBR })}`, 15, 30);
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Data de geração: ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: ptBR })}`, 15, currentY);
+    currentY += 7;
     
     let filterInfo = [];
     if (startDate) filterInfo.push(`De: ${format(parseISO(startDate), 'dd/MM/yyyy', { locale: ptBR })}`);
@@ -30,7 +70,10 @@ const ReportModal = ({ isOpen, onClose, equipments, locations }) => {
     if (selectedLocation !== 'all') filterInfo.push(`Localidade: ${selectedLocation}`);
     
     if (filterInfo.length > 0) {
-      doc.text(`Filtros: ${filterInfo.join(' | ')}`, 15, 40);
+      doc.text(`Filtros: ${filterInfo.join(' | ')}`, 15, currentY);
+      currentY += 10;
+    } else {
+      currentY += 3; 
     }
 
     let filteredEquipments = equipments;
@@ -107,18 +150,14 @@ const ReportModal = ({ isOpen, onClose, equipments, locations }) => {
       }
     });
     
-    let currentY = 50;
-    if (filterInfo.length > 0) currentY = 60;
-
-
     doc.autoTable({
       startY: currentY,
       head: [['Nome', 'Tipo', 'Status', 'Localidade', 'Última Verificação', 'Verificado', 'Observações', 'Foto']],
       body: tableData,
       theme: 'grid',
-      styles: { fontSize: 8, cellPadding: 1.5, overflow: 'linebreak' },
-      headStyles: { fillColor: [46, 125, 50], textColor: [255,255,255] },
-      alternateRowStyles: { fillColor: [240, 240, 240] },
+      styles: { fontSize: 8, cellPadding: 1.5, overflow: 'linebreak', textColor: [50,50,50] },
+      headStyles: { fillColor: [0, 80, 157], textColor: [255,255,255], fontSize: 9 },
+      alternateRowStyles: { fillColor: [230, 240, 255] },
       columnStyles: {
         0: { cellWidth: 30 }, 
         1: { cellWidth: 15 }, 
@@ -142,18 +181,18 @@ const ReportModal = ({ isOpen, onClose, equipments, locations }) => {
           doc.addPage();
           currentY = 20;
         }
-        doc.setFontSize(10);
+        doc.setFontSize(9);
+        doc.setTextColor(50,50,50);
         doc.text(`Foto de: ${eq.name}`, 15, currentY);
         try {
-          doc.addImage(imageMap[eq.id], 'JPEG', 15, currentY + 5, 40, 40);
+          doc.addImage(imageMap[eq.id], 'JPEG', 15, currentY + 3, 40, 40);
         } catch (e) {
           console.error("Erro ao adicionar imagem ao PDF:", e);
           doc.text("Erro ao carregar imagem", 15, currentY + 10);
         }
-        currentY += 50; 
+        currentY += 48; 
       }
     }
-
 
     const stats = {
       total: filteredEquipments.length,
@@ -163,23 +202,24 @@ const ReportModal = ({ isOpen, onClose, equipments, locations }) => {
       broken: filteredEquipments.filter(eq => eq.status === 'defeito').length
     };
     
-    if (currentY + 50 > doc.internal.pageSize.height -10) {
+    if (currentY + 40 > doc.internal.pageSize.height -10) {
         doc.addPage();
         currentY = 20;
     }
 
-    doc.setFontSize(12);
+    doc.setFontSize(11);
+    doc.setTextColor(50,50,50);
     doc.text('Estatísticas:', 15, currentY);
-    currentY += 7;
-    doc.setFontSize(10);
+    currentY += 6;
+    doc.setFontSize(9);
     doc.text(`Total de equipamentos: ${stats.total}`, 15, currentY);
-    currentY += 7;
+    currentY += 6;
     doc.text(`Equipamentos verificados: ${stats.checked}`, 15, currentY);
-    currentY += 7;
+    currentY += 6;
     doc.text(`Funcionando: ${stats.functioning}`, 15, currentY);
-    currentY += 7;
+    currentY += 6;
     doc.text(`Em manutenção: ${stats.maintenance}`, 15, currentY);
-    currentY += 7;
+    currentY += 6;
     doc.text(`Com defeito: ${stats.broken}`, 15, currentY);
 
     doc.save(`relatorio-equipamentos-${format(new Date(), 'dd-MM-yyyy_HH-mm')}.pdf`);
@@ -206,17 +246,17 @@ const ReportModal = ({ isOpen, onClose, equipments, locations }) => {
           exit={{ scale: 0.9, opacity: 0 }}
           className="w-full max-w-lg"
         >
-          <Card className="glass-effect border-blue-500/20">
+          <Card className="bg-company-card-bg border-company-border shadow-2xl">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-xl bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                <CardTitle className="text-xl text-company-brand">
                   Gerar Relatório
                 </CardTitle>
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={onClose}
-                  className="text-gray-400 hover:text-white"
+                  className="text-company-text-secondary hover:text-company-text-primary"
                 >
                   <X className="h-5 w-5" />
                 </Button>
@@ -226,37 +266,37 @@ const ReportModal = ({ isOpen, onClose, equipments, locations }) => {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-300 mb-2 block">
+                  <label className="text-sm font-medium text-company-text-secondary mb-1 block">
                     Data Inicial
                   </label>
                   <Input
                     type="date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="bg-gray-800/50 border-gray-600 text-white"
+                    className="bg-company-input-bg border-company-border text-company-text-primary focus:ring-company-brand focus:border-company-brand"
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-300 mb-2 block">
+                  <label className="text-sm font-medium text-company-text-secondary mb-1 block">
                     Data Final
                   </label>
                   <Input
                     type="date"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="bg-gray-800/50 border-gray-600 text-white"
+                    className="bg-company-input-bg border-company-border text-company-text-primary focus:ring-company-brand focus:border-company-brand"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-sm font-medium text-gray-300 mb-2 block">
+                <label className="text-sm font-medium text-company-text-secondary mb-1 block">
                   Localidade
                 </label>
                 <select
                   value={selectedLocation}
                   onChange={(e) => setSelectedLocation(e.target.value)}
-                  className="w-full px-3 py-2 bg-gray-800/50 border border-gray-600 rounded-md text-white"
+                  className="w-full px-3 py-2 bg-company-input-bg border-company-border rounded-md text-company-text-primary focus:ring-company-brand focus:border-company-brand"
                 >
                   <option value="all">Todas as localidades</option>
                   {locations.map(loc => (
@@ -268,7 +308,7 @@ const ReportModal = ({ isOpen, onClose, equipments, locations }) => {
               <div className="flex gap-3 pt-4">
                 <Button
                   onClick={generatePDF}
-                  className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                  className="flex-1 bg-company-brand text-company-brand-foreground hover:bg-company-brand/90"
                 >
                   <FileDown className="h-4 w-4 mr-2" />
                   Baixar PDF
@@ -281,7 +321,7 @@ const ReportModal = ({ isOpen, onClose, equipments, locations }) => {
                     });
                   }}
                   variant="outline"
-                  className="border-blue-500/50 text-blue-400 hover:bg-blue-500/10"
+                  className="border-company-brand-accent text-company-brand-accent hover:bg-company-brand-accent/10 flex-1"
                 >
                   <Printer className="h-4 w-4 mr-2" />
                   Imprimir
@@ -292,10 +332,11 @@ const ReportModal = ({ isOpen, onClose, equipments, locations }) => {
                     toast({
                       title: "Em breve!",
                       description: "Função de compartilhamento será implementada em breve.",
+                      variant: "default"
                     });
                   }}
                   variant="outline"
-                  className="border-purple-500/50 text-purple-400 hover:bg-purple-500/10"
+                  className="border-company-brand-accent/70 text-company-brand-accent/80 hover:bg-company-brand-accent/10"
                 >
                   <Share2 className="h-4 w-4" />
                 </Button>

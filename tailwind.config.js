@@ -6,6 +6,7 @@ module.exports = {
 		'./components/**/*.{js,jsx}',
 		'./app/**/*.{js,jsx}',
 		'./src/**/*.{js,jsx}',
+		'./index.html',
 	],
 	theme: {
 		container: {
@@ -50,6 +51,19 @@ module.exports = {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))',
 				},
+        company: {
+          background: 'hsl(var(--ntt-bg))',
+          foreground: 'hsl(var(--ntt-text-primary))', /* Renomeado para consistência */
+          'header-bg': 'hsl(var(--ntt-header-bg))',
+          'card-bg': 'hsl(var(--ntt-card-bg))',
+          'input-bg': 'hsl(var(--ntt-input-bg))',
+          border: 'hsl(var(--ntt-border))',
+          brand: 'hsl(var(--ntt-brand))',
+          'brand-foreground': 'hsl(var(--ntt-brand-foreground))',
+          'brand-accent': 'hsl(var(--ntt-brand-accent))',
+          'text-primary': 'hsl(var(--ntt-text-primary))',
+          'text-secondary': 'hsl(var(--ntt-text-secondary))',
+        }
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -58,12 +72,12 @@ module.exports = {
 			},
 			keyframes: {
 				'accordion-down': {
-					from: { height: 0 },
+					from: { height: '0' },
 					to: { height: 'var(--radix-accordion-content-height)' },
 				},
 				'accordion-up': {
 					from: { height: 'var(--radix-accordion-content-height)' },
-					to: { height: 0 },
+					to: { height: '0' },
 				},
 			},
 			animation: {

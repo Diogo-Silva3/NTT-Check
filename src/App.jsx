@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Toaster } from '@/components/ui/toaster';
@@ -31,6 +31,9 @@ const PREDEFINED_LOCATIONS = [
   'Gravataí'
 ];
 
+const LOGO_PLACEHOLDER_TEXT = "NTT DATA";
+const COMPANY_LOGO_URL = ""; 
+
 function App() {
   const [equipments, setEquipments] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -43,14 +46,13 @@ function App() {
   const [currentEquipmentId, setCurrentEquipmentId] = useState(null);
   const [showPhotoViewer, setShowPhotoViewer] = useState(false);
   const [currentPhoto, setCurrentPhoto] = useState(null);
+  const [logoUrl, setLogoUrl] = useState(COMPANY_LOGO_URL);
 
-  // Carregar dados do localStorage
   useEffect(() => {
     const savedEquipments = localStorage.getItem('equipments');
     if (savedEquipments) {
       setEquipments(JSON.parse(savedEquipments));
     } else {
-      // Dados de exemplo
       const sampleData = [
         {
           id: 1,
@@ -78,9 +80,13 @@ function App() {
       setEquipments(sampleData);
       localStorage.setItem('equipments', JSON.stringify(sampleData));
     }
+    
+    if (COMPANY_LOGO_URL && COMPANY_LOGO_URL !== "YOUR_LOGO_URL_HERE") {
+      setLogoUrl(COMPANY_LOGO_URL);
+    }
+
   }, []);
 
-  // Salvar no localStorage sempre que equipments mudar
   useEffect(() => {
     localStorage.setItem('equipments', JSON.stringify(equipments));
   }, [equipments]);
@@ -131,7 +137,6 @@ function App() {
     setShowPhotoViewer(true);
   };
 
-  // Filtros
   const filteredEquipments = equipments.filter(equipment => {
     const matchesSearch = equipment.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          equipment.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -144,7 +149,6 @@ function App() {
     return matchesSearch && matchesStatus && matchesType && matchesLocation;
   });
 
-  // Estatísticas
   const stats = {
     total: equipments.length,
     checked: equipments.filter(eq => eq.checked).length,
@@ -153,87 +157,79 @@ function App() {
     broken: equipments.filter(eq => eq.status === 'defeito').length
   };
 
-  // Listas únicas para filtros
   const uniqueTypes = [...new Set(equipments.map(eq => eq.type))];
   const uniqueLocations = [...new Set(equipments.map(eq => eq.location).filter(Boolean))];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 p-4">
+    <div className="min-h-screen bg-company-background p-4 text-company-foreground">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
+        <motion.header
+          initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-8"
+          transition={{ duration: 0.5 }}
+          className="flex flex-col md:flex-row justify-between items-center mb-10 p-6 rounded-lg shadow-xl bg-company-header-bg border border-company-border"
         >
-          <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 bg-clip-text text-transparent mb-4">
+          <div className="flex items-center space-x-3">
+            {logoUrl ? (
+              <img-replace src={logoUrl} alt="Logo da Empresa" className="h-10 md:h-12 object-contain"/>
+            ) : (
+               <span className="text-3xl md:text-4xl font-bold text-company-brand">
+                {LOGO_PLACEHOLDER_TEXT}
+              </span>
+            )}
+          </div>
+          <h1 className="text-2xl md:text-4xl font-semibold text-company-text-primary mt-4 md:mt-0 text-center md:text-right">
             CheckList TI
           </h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            Gerencie seus equipamentos de informática com facilidade e capture fotos em tempo real
-          </p>
-        </motion.div>
-
-        {/* Estatísticas */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8"
+        </motion.header>
+        
+        <motion.p 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+          className="text-md text-company-text-secondary text-center mb-10 max-w-3xl mx-auto"
         >
-          <Card className="glass-effect border-blue-500/20">
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-blue-400">{stats.total}</div>
-              <div className="text-sm text-gray-400">Total</div>
-            </CardContent>
-          </Card>
-          
-          <Card className="glass-effect border-green-500/20">
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-green-400">{stats.checked}</div>
-              <div className="text-sm text-gray-400">Verificados</div>
-            </CardContent>
-          </Card>
-          
-          <Card className="glass-effect border-green-500/20">
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-green-400">{stats.functioning}</div>
-              <div className="text-sm text-gray-400">Funcionando</div>
-            </CardContent>
-          </Card>
-          
-          <Card className="glass-effect border-yellow-500/20">
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-yellow-400">{stats.maintenance}</div>
-              <div className="text-sm text-gray-400">Manutenção</div>
-            </CardContent>
-          </Card>
-          
-          <Card className="glass-effect border-red-500/20">
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-red-400">{stats.broken}</div>
-              <div className="text-sm text-gray-400">Defeito</div>
-            </CardContent>
-          </Card>
-        </motion.div>
+          Gerencie seus equipamentos de informática com facilidade e capture fotos em tempo real.
+        </motion.p>
 
-        {/* Controles */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.1, duration: 0.5 }}
+          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-8"
+        >
+          {[
+            { label: 'Total', value: stats.total, color: 'text-company-brand-accent' },
+            { label: 'Verificados', value: stats.checked, color: 'text-green-500' },
+            { label: 'Funcionando', value: stats.functioning, color: 'text-green-500' },
+            { label: 'Manutenção', value: stats.maintenance, color: 'text-yellow-500' },
+            { label: 'Defeito', value: stats.broken, color: 'text-red-500' },
+          ].map(stat => (
+            <Card key={stat.label} className="bg-company-card-bg border-company-border hover:shadow-lg transition-shadow duration-300">
+              <CardContent className="p-4 text-center">
+                <div className={`text-3xl font-bold ${stat.color}`}>{stat.value}</div>
+                <div className="text-sm text-company-text-secondary">{stat.label}</div>
+              </CardContent>
+            </Card>
+          ))}
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
           className="mb-8"
         >
-          <Card className="glass-effect border-green-500/20">
+          <Card className="bg-company-card-bg border-company-border">
             <CardContent className="p-6">
               <div className="flex flex-col md:flex-row gap-4 items-center">
                 <div className="relative flex-1 w-full md:w-auto">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-company-text-secondary h-4 w-4" />
                   <Input
                     placeholder="Buscar equipamentos..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 w-full"
+                    className="pl-10 bg-company-input-bg border-company-border text-company-text-primary placeholder:text-company-text-secondary w-full focus:ring-company-brand focus:border-company-brand"
                   />
                 </div>
                 
@@ -241,7 +237,7 @@ function App() {
                   <select
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value)}
-                    className="px-3 py-2 bg-gray-800/50 border border-gray-600 rounded-md text-white text-sm"
+                    className="px-3 py-2 bg-company-input-bg border-company-border rounded-md text-company-text-primary text-sm focus:ring-company-brand focus:border-company-brand"
                   >
                     <option value="all">Todos os Status</option>
                     <option value="funcionando">Funcionando</option>
@@ -252,7 +248,7 @@ function App() {
                   <select
                     value={filterType}
                     onChange={(e) => setFilterType(e.target.value)}
-                    className="px-3 py-2 bg-gray-800/50 border border-gray-600 rounded-md text-white text-sm"
+                    className="px-3 py-2 bg-company-input-bg border-company-border rounded-md text-company-text-primary text-sm focus:ring-company-brand focus:border-company-brand"
                   >
                     <option value="all">Todos os Tipos</option>
                     {uniqueTypes.map(type => (
@@ -263,7 +259,7 @@ function App() {
                   <select
                     value={filterLocation}
                     onChange={(e) => setFilterLocation(e.target.value)}
-                    className="px-3 py-2 bg-gray-800/50 border border-gray-600 rounded-md text-white text-sm"
+                    className="px-3 py-2 bg-company-input-bg border-company-border rounded-md text-company-text-primary text-sm focus:ring-company-brand focus:border-company-brand"
                   >
                     <option value="all">Todas Localidades</option>
                     {PREDEFINED_LOCATIONS.map(loc => (
@@ -276,7 +272,7 @@ function App() {
                   
                   <Button
                     onClick={() => setShowAddForm(true)}
-                    className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+                    className="bg-company-brand text-company-brand-foreground hover:bg-company-brand/90"
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     Adicionar
@@ -285,7 +281,7 @@ function App() {
                   <Button
                     onClick={() => setShowReportModal(true)}
                     variant="outline"
-                    className="border-blue-500/50 text-blue-400 hover:bg-blue-500/10"
+                    className="border-company-brand-accent text-company-brand-accent hover:bg-company-brand-accent/10"
                   >
                     <FileDown className="h-4 w-4 mr-2" />
                     Relatório
@@ -296,11 +292,10 @@ function App() {
           </Card>
         </motion.div>
 
-        {/* Lista de Equipamentos */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
           <AnimatePresence>
@@ -323,11 +318,11 @@ function App() {
             animate={{ opacity: 1 }}
             className="text-center py-12"
           >
-            <div className="text-6xl mb-4">📱</div>
-            <h3 className="text-xl font-semibold text-gray-300 mb-2">
+            <div className="text-6xl mb-4 text-company-brand">📱</div>
+            <h3 className="text-xl font-semibold text-company-text-primary mb-2">
               Nenhum equipamento encontrado
             </h3>
-            <p className="text-gray-400 mb-6">
+            <p className="text-company-text-secondary mb-6">
               {searchTerm || filterStatus !== 'all' || filterType !== 'all' || filterLocation !== 'all'
                 ? 'Tente ajustar os filtros de busca'
                 : 'Comece adicionando seu primeiro equipamento'
@@ -335,7 +330,7 @@ function App() {
             </p>
             <Button
               onClick={() => setShowAddForm(true)}
-              className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+              className="bg-company-brand text-company-brand-foreground hover:bg-company-brand/90"
             >
               <Plus className="h-4 w-4 mr-2" />
               Adicionar Equipamento
@@ -343,7 +338,6 @@ function App() {
           </motion.div>
         )}
 
-        {/* Modais */}
         <AddEquipmentForm
           isOpen={showAddForm}
           onClose={() => setShowAddForm(false)}
@@ -374,6 +368,8 @@ function App() {
           onClose={() => setShowReportModal(false)}
           equipments={equipments}
           locations={PREDEFINED_LOCATIONS}
+          logoUrl={logoUrl}
+          logoPlaceholder={LOGO_PLACEHOLDER_TEXT}
         />
 
         <Toaster />

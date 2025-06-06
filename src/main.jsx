@@ -4,7 +4,7 @@ import App from '@/App';
 import '@/index.css';
 import App from './App.jsx'
 import './index.css'
-import './i18n/i18n'
+import './i18n/i18n.js'; // ou .jsx, .ts, dependendo do seu caso
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

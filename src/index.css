@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    /* Cores baseadas no site da NTT DATA (https://www.nttdata.com/global/en/) */
+    /* Cores baseadas no site da NTT DATA (https://br.nttdata.com/) */
     --company-bg-light: 255 100% 100%; /* Branco para fundo principal */
     --company-bg-medium: 220 13% 95%; /* Cinza claro para fundos secundários/cards */
     --company-bg-dark: 220 15% 15%; /* Azul muito escuro para modo escuro */
